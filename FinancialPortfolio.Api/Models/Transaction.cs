@@ -5,6 +5,10 @@ namespace FinancialPortfolio.Api.Models;
 
 public class Transaction
 {
+    public int Id { get; set; }
+
+    public int AccountId { get; set; }
+
     [Required]
     [StringLength(20)]
     public string TransactionType { get; set; } = string.Empty; // Buy, Sell, Deposit, Withdrawal
