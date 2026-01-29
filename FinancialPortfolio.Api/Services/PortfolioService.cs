@@ -26,7 +26,7 @@ public class PortfolioService : IPortfolioService
     public async Task<IEnumerable<Portfolio>> GetUserPortfoliosAsync(int userId)
     {
         return await _dbContext.Portfolios
-            .Where(u => u.Id == userId)
+            .Where(u => u.UserId == userId)
             .Include(p => p.Accounts)
             .Include(p => p.Holdings)
             .ToListAsync();
