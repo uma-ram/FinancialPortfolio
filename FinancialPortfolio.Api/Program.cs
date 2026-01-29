@@ -1,6 +1,7 @@
+using FinancialPortfolio.Api.Data;
+using FinancialPortfolio.Api.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.InMemory;
-using FinancialPortfolio.Api.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,10 @@ else
     builder.Services.AddDbContext<FinancialPortfolioDbContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 }
-
+// Register Services (Dependency Injection)
+builder.Services.AddScoped<IPortfolioService, PortfolioService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
