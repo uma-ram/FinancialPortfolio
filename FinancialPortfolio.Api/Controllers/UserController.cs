@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using FinancialPortfolio.Api.Data;
+﻿using FinancialPortfolio.Api.Models.DTOs;
 using FinancialPortfolio.Api.Models;
+using FinancialPortfolio.Api.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FinancialPortfolio.Api.Controllers;
 
@@ -9,20 +9,22 @@ namespace FinancialPortfolio.Api.Controllers;
 [Route("api/[controller]")]
 public class UserController : ControllerBase
 {
-    private readonly FinancialPortfolioDbContext _context;
+    private readonly IUserService _userService;
+    private readonly ILogger<UserController> _logger;
 
-    public UserController(FinancialPortfolioDbContext context)
+    public UserController(IUserService userService, ILogger<UserController> logger)
     {
-        _context = context;
+        _userService = userService;
+        _logger = logger;
     }
 
     //GET: api/users
     [HttpGet]
     public async Task<ActionResult<IEnumerable<User>>> GetUsers()
     {
-        var users = await _context.Users
-            .Include(u => u.Portfolios)
-            .ToListAsync();
+        _logger.LogInformation("Fetching all users");
+        var users = await _userService.GetAllUsersAsync();
+        _logger.LogInformation("Fetched {Count} users", users.Count());
         return Ok(users);
     }
 
@@ -30,14 +32,17 @@ public class UserController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<User>> GetUser(int id)
     {
-        var user = await _context.Users
-            .Include(u => u.Portfolios)
-            .FirstOrDefaultAsync(u => u.Id == id);
+        _logger.LogInformation("Fetching user with ID {UserId}", id);
+
+        var user = await _userService.GetUserByIdAsync(id);
 
         if (user == null)
         {
+            _logger.LogWarning("User with ID {UserId} not found", id);
             return NotFound(new { message = $"User with ID {id} not found" });
         }
+
+        _logger.LogInformation("User with ID {UserId} fetched successfully", id);
 
         return Ok(user);
     }
@@ -47,44 +52,44 @@ public class UserController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<User>> CreateUser(CreateUserRequest request)
     {
-        var existingEmail = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        _logger.LogInformation("Creating user with email {Email}", request.Email);
 
-        if (existingEmail != null)
+        try
         {
-            return BadRequest(new { message = "Email Already exists !" });
+            var user = await _userService.CreateUserAsync(request);
+
+            _logger.LogInformation("User created successfully with ID {UserId}", user.Id);
+
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
-        var user = new User
+        catch (ArgumentException ex)
         {
-            Username = request.Name,
-            Email = request.Email,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+            _logger.LogWarning(ex, "User creation failed for email {Email}", request.Email);
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error while creating user with email {Email}", request.Email);
+            return StatusCode(500, new { message = "Internal server error" });
+        }
     }
 
     // DELETE: api/users/5
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteUser(int id)
     {
-        var user = await _context.Users.FindAsync(id);
+        _logger.LogInformation("Deleting user with ID {UserId}", id);
 
-        if (user == null)
+        var deleted = await _userService.DeleteUserAsync(id);
+
+        if (!deleted)
         {
+            _logger.LogWarning("Delete failed. User with ID {UserId} not found", id);
             return NotFound(new { message = $"User with ID {id} not found" });
         }
 
-        _context.Users.Remove(user);
-        await _context.SaveChangesAsync();
+        _logger.LogInformation("User with ID {UserId} deleted successfully", id);
 
         return NoContent();
     }
-}
-public class CreateUserRequest
-{
-    public string Name { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
 }
