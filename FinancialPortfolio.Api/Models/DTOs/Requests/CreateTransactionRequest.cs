@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FinancialPortfolio.Api.Models.DTOs;
+namespace FinancialPortfolio.Api.Models.DTOs.Requests;
 
 public class CreateTransactionRequest
 {

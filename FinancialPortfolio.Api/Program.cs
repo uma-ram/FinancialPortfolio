@@ -2,6 +2,9 @@ using FinancialPortfolio.Api.Data;
 using FinancialPortfolio.Api.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.InMemory;
+using AutoMapper;
+using FinancialPortfolio.Api.Mappings;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,9 +32,15 @@ builder.Services.AddSwaggerGen();
 // Add Controllers
 builder.Services.AddControllers();
 
+//Automapper
+builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

@@ -2,18 +2,27 @@
 
 using Xunit;
 using FinancialPortfolio.Api.Models;
-using FinancialPortfolio.Api.Models.DTOs;
+using FinancialPortfolio.Api.Models.DTOs.Requests;
+using FinancialPortfolio.Api.Models.DTOs.Responses;
 using FinancialPortfolio.Api.Services;
 using FinancialPortfolio.Tests.TestHelpers;
 using Castle.Components.DictionaryAdapter.Xml;
+using AutoMapper;
+using FinancialPortfolio.Api.Mappings;
 
 public class PortfolioServiceTests
 {
+    private readonly IMapper _mapper; // = AutoMapperConfig.Initialize();
+    public PortfolioServiceTests ()
+    {
+        _mapper = TestMapperFactory.Create();
+    }
     [Fact]
     public async Task CreatePortfolioAsync_CreatePortfolioWhenUserExists()
     {
         var context = DbContextHelper.CreateInMemoryContext();
-        var service = new PortfolioService(context);
+        //var mapper = CreateMapper();
+        var service = new PortfolioService(context, _mapper);
 
         //Arrange
         var user = new User();
@@ -47,7 +56,7 @@ public class PortfolioServiceTests
     {
         // Arrange
         var context = DbContextHelper.CreateInMemoryContext();
-        var service = new PortfolioService(context);
+        var service = new PortfolioService(context, _mapper);
 
         var request = new CreatePortfolioRequest
         {
@@ -64,7 +73,7 @@ public class PortfolioServiceTests
     public async Task GetUserPortfolioAsync_ShouldReturnUserPortfolio()
     {
         var context = DbContextHelper.CreateInMemoryContext();
-        var service = new PortfolioService(context);
+        var service = new PortfolioService(context, _mapper);
 
         //Arrange
 
@@ -89,7 +98,7 @@ public class PortfolioServiceTests
     {
         // Arrange
         var context = DbContextHelper.CreateInMemoryContext();
-        var service = new PortfolioService(context);
+        var service = new PortfolioService(context, _mapper);
 
         var user = new User { Username = "Test", Email = "test@example.com", CreatedAt = DateTime.UtcNow };
         context.Users.Add(user);

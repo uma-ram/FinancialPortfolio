@@ -1,19 +1,24 @@
 ﻿using FinancialPortfolio.Api.Models;
-using FinancialPortfolio.Api.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
 using FinancialPortfolio.Api.Data;
+using FinancialPortfolio.Api.Models.DTOs.Requests;
+using FinancialPortfolio.Api.Models.DTOs.Responses;
+using AutoMapper;
+
 
 namespace FinancialPortfolio.Api.Services;
 
 public class AccountService : IAccountService
 {
     private readonly FinancialPortfolioDbContext _context;
+    private  readonly IMapper _mapper;
 
-    public AccountService(FinancialPortfolioDbContext context)
+    public AccountService(FinancialPortfolioDbContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
-    public async Task<Account> CreateAccountAsync(CreateAccountRequest request)
+    public async Task<AccountResponse> CreateAccountAsync(CreateAccountRequest request)
     {
         // Verify portfolio exists
         var portfolioExists = await _context.Portfolios.AnyAsync(p => p.Id == request.PortfolioId);
@@ -33,7 +38,7 @@ public class AccountService : IAccountService
         _context.Accounts.Add(account);
         await _context.SaveChangesAsync();
 
-        return account;
+        return _mapper.Map<AccountResponse>(account);
     }
 
     public async Task<bool> DeleteAccountAsync(int accountId)
@@ -49,18 +54,20 @@ public class AccountService : IAccountService
         return true;
     }
 
-    public async Task<Account?> GetAccountByIdAsync(int accountId)
+    public async Task<AccountResponse?> GetAccountByIdAsync(int accountId)
     {
-        return await _context.Accounts
+        var response =  await _context.Accounts
             .Include(a => a.Transactions)
             .FirstOrDefaultAsync(a => a.Id == accountId);
+        return _mapper.Map<AccountResponse>(response);
     }
 
-    public async Task<IEnumerable<Account>> GetPortfolioAccountsAsync(int portfolioId)
+    public async Task<IEnumerable<AccountResponse>> GetPortfolioAccountsAsync(int portfolioId)
     {
-        return await _context.Accounts
+        var response = await _context.Accounts
            .Where(a => a.PortfolioId == portfolioId)
            .Include(a => a.Transactions)
            .ToListAsync();
+        return _mapper.Map<IEnumerable<AccountResponse>>(response.ToList());
     }
 }

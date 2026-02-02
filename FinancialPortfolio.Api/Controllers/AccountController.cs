@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using FinancialPortfolio.Api.Services;
-using FinancialPortfolio.Api.Models.DTOs;
+using FinancialPortfolio.Api.Models.DTOs.Requests;
 
 namespace FinancialPortfolio.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/accounts")]
 public class AccountController : ControllerBase
 {
     private readonly IAccountService _accountService;

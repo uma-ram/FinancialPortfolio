@@ -1,12 +1,14 @@
 ﻿namespace FinancialPortfolio.Api.Services;
 
 using FinancialPortfolio.Api.Models;
-using FinancialPortfolio.Api.Models.DTOs;
+using FinancialPortfolio.Api.Models.DTOs.Requests;
+using FinancialPortfolio.Api.Models.DTOs.Responses;
+
 public interface IAccountService
 {
-    Task<Account?> GetAccountByIdAsync(int accountId);
-    Task<IEnumerable<Account>> GetPortfolioAccountsAsync(int portfolioId);
-    Task<Account> CreateAccountAsync(CreateAccountRequest request);
+    Task<AccountResponse?> GetAccountByIdAsync(int accountId);
+    Task<IEnumerable<AccountResponse>> GetPortfolioAccountsAsync(int portfolioId);
+    Task<AccountResponse> CreateAccountAsync(CreateAccountRequest request);
     Task<bool> DeleteAccountAsync(int accountId);
 
 }

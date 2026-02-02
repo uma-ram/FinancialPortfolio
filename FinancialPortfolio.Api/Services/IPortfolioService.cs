@@ -1,17 +1,17 @@
 ﻿namespace FinancialPortfolio.Api.Services;
 
 using FinancialPortfolio.Api.Models;
-using FinancialPortfolio.Api.Models.DTOs;
-
+using FinancialPortfolio.Api.Models.DTOs.Requests;
+using FinancialPortfolio.Api.Models.DTOs.Responses;
 
 public interface IPortfolioService
 {
-    Task<Portfolio?> GetPortfolioByIdAsync(int portfolioId);
-    Task<IEnumerable<Portfolio>> GetUserPortfoliosAsync(int userId);
+    Task<PortfolioResponse?> GetPortfolioByIdAsync(int portfolioId);
+    Task<IEnumerable<PortfolioResponse>> GetUserPortfoliosAsync(int userId);
 
-    Task<Portfolio> CreatePortfolioAsync(CreatePortfolioRequest request);
+    Task<PortfolioResponse> CreatePortfolioAsync(CreatePortfolioRequest request);
 
-    Task<Portfolio?> UpdatePortfolioAsync(int portfolioId, CreatePortfolioRequest request);
+    Task<PortfolioResponse?> UpdatePortfolioAsync(int portfolioId, CreatePortfolioRequest request);
 
     Task<bool> DeletePortfolioAsync(int portfolioId);
 

@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FinancialPortfolio.Api.Models.DTOs.Requests;
+using FinancialPortfolio.Api.Models.DTOs.Responses;
 using FinancialPortfolio.Api.Services;
-using FinancialPortfolio.Api.Models.DTOs;
+using Microsoft.AspNetCore.Mvc;
 
 
 namespace FinancialPortfolio.Api.Controllers;
 
+[ApiController]
+[Route("api/transactions")] 
 public class TransactionController : ControllerBase
 {
     private readonly ITransactionService _transactionService;
@@ -19,7 +22,7 @@ public class TransactionController : ControllerBase
 
     // GET: api/transactions/account/5
     [HttpGet("account/{accountId}")]
-    public async Task<IActionResult> GetAccountTransactions(int accountId)
+    public async Task<ActionResult<TransactionResponse>> GetAccountTransactions(int accountId)
     {
         try
         {
@@ -35,7 +38,7 @@ public class TransactionController : ControllerBase
 
     // GET: api/transactions/portfolio/5
     [HttpGet("portfolio/{portfolioId}")]
-    public async Task<IActionResult> GetPortfolioTransactions(int portfolioId)
+    public async Task<ActionResult<TransactionResponse>> GetPortfolioTransactions(int portfolioId)
     {
         try
         {
@@ -51,7 +54,7 @@ public class TransactionController : ControllerBase
 
     // GET: api/transactions/5
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetTransaction(int id)
+    public async Task<ActionResult<TransactionResponse>> GetTransaction(int id)
     {
         try
         {
@@ -73,7 +76,7 @@ public class TransactionController : ControllerBase
 
     // POST: api/transactions
     [HttpPost]
-    public async Task<IActionResult> CreateTransaction([FromBody] CreateTransactionRequest request)
+    public async Task<ActionResult<TransactionResponse>> CreateTransaction([FromBody] CreateTransactionRequest request)
     {
         try
         {

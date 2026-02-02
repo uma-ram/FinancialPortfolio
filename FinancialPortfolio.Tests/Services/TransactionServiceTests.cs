@@ -1,19 +1,25 @@
-﻿using Xunit;
-using FinancialPortfolio.Api.Services;
+﻿using AutoMapper;
 using FinancialPortfolio.Api.Models;
-using FinancialPortfolio.Api.Models.DTOs;
+using FinancialPortfolio.Api.Models.DTOs.Requests;
+using FinancialPortfolio.Api.Services;
 using FinancialPortfolio.Tests.TestHelpers;
+using Xunit;
 
 namespace FinancialPortfolio.Tests.Services;
 
 public class TransactionServiceTests
 {
+    private readonly IMapper _mapper; // = AutoMapperConfig.Initialize();
+    public TransactionServiceTests()
+    {
+        _mapper = TestMapperFactory.Create();
+    }
     [Fact]
     public async Task CreateTransactionAsync_ShouldCreateBuyTransaction_AndUpdateHoldings()
     {
         // Arrange
         var context = DbContextHelper.CreateInMemoryContext();
-        var service = new TransactionService(context);
+        var service = new TransactionService(context, _mapper);
 
         var user = new User { Username = "Investor", Email = "investor@example.com", CreatedAt = DateTime.UtcNow };
         var portfolio = new Portfolio { Name = "Growth", UserId = 1, CreatedAt = DateTime.UtcNow };
@@ -54,7 +60,7 @@ public class TransactionServiceTests
     {
         // Arrange
         var context = DbContextHelper.CreateInMemoryContext();
-        var service = new TransactionService(context);
+        var service = new TransactionService(context, _mapper);
 
         var user = new User { Username = "Test", Email = "test@example.com", CreatedAt = DateTime.UtcNow };
         var portfolio = new Portfolio { Name = "Test", UserId = 1, CreatedAt = DateTime.UtcNow };
@@ -100,7 +106,7 @@ public class TransactionServiceTests
     {
         // Arrange
         var context = DbContextHelper.CreateInMemoryContext();
-        var service = new TransactionService(context);
+        var service = new TransactionService(context, _mapper);
 
         var user = new User { Username = "Test", Email = "test@example.com", CreatedAt = DateTime.UtcNow };
         var portfolio = new Portfolio { Name = "Test", UserId = 1, CreatedAt = DateTime.UtcNow };
@@ -143,7 +149,7 @@ public class TransactionServiceTests
     {
         // Arrange
         var context = DbContextHelper.CreateInMemoryContext();
-        var service = new TransactionService(context);
+        var service = new TransactionService(context, _mapper);
 
         var user = new User { Username = "Test", Email = "test@example.com", CreatedAt = DateTime.UtcNow };
         var portfolio = new Portfolio { Name = "Test", UserId = 1, CreatedAt = DateTime.UtcNow };

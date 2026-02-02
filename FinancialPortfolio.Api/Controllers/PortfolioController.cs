@@ -1,17 +1,19 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FinancialPortfolio.Api.Models.DTOs.Requests;
+using FinancialPortfolio.Api.Models.DTOs.Responses;
 using FinancialPortfolio.Api.Services;
-using FinancialPortfolio.Api.Models.DTOs;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FinancialPortfolio.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/portfolios")]
 public class PortfolioController : ControllerBase
 {
     private readonly IPortfolioService _portfolioService;
     private readonly ILogger<PortfolioController> _logger;
 
-    public PortfolioController(IPortfolioService portfolioService, ILogger<PortfolioController> logger  )
+
+    public PortfolioController(IPortfolioService portfolioService, ILogger<PortfolioController> logger)
     {
         _portfolioService = portfolioService;
         _logger = logger;
@@ -19,7 +21,7 @@ public class PortfolioController : ControllerBase
 
     // GET: api/portfolios/user/5
     [HttpGet("user/{userId}")]
-    public async Task<IActionResult> GetUserPortfolios(int userId)
+    public async Task<ActionResult<IEnumerable<PortfolioResponse>>> GetUserPortfolios(int userId)
     {
         try
         {
@@ -35,7 +37,7 @@ public class PortfolioController : ControllerBase
 
     // GET: api/portfolios/5
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetPortfolio(int id)
+    public async Task<ActionResult<PortfolioResponse>> GetPortfolio(int id)
     {
         try
         {
@@ -44,8 +46,7 @@ public class PortfolioController : ControllerBase
             if (portfolio == null)
             {
                 return NotFound(new { message = $"Portfolio with ID {id} not found" });
-            }
-
+            }  
             return Ok(portfolio);
         }
         catch (Exception ex)
@@ -57,7 +58,7 @@ public class PortfolioController : ControllerBase
 
     // GET: api/portfolios/5/summary
     [HttpGet("{id}/summary")]
-    public async Task<IActionResult> GetPortfolioSummary(int id)
+    public async Task<ActionResult<PortfolioSummaryResponse>> GetPortfolioSummary(int id)
     {
         try
         {
@@ -79,7 +80,7 @@ public class PortfolioController : ControllerBase
 
     // POST: api/portfolios
     [HttpPost]
-    public async Task<IActionResult> CreatePortfolio([FromBody] CreatePortfolioRequest request)
+    public async Task<ActionResult<PortfolioResponse>> CreatePortfolio([FromBody] CreatePortfolioRequest request)
     {
         try
         {
@@ -99,7 +100,7 @@ public class PortfolioController : ControllerBase
 
     // PUT: api/portfolios/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdatePortfolio(int id, [FromBody] CreatePortfolioRequest request)
+    public async Task<ActionResult<PortfolioResponse>> UpdatePortfolio(int id, [FromBody] CreatePortfolioRequest request)
     {
         try
         {

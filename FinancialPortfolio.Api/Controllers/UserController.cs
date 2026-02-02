@@ -1,12 +1,14 @@
-﻿using FinancialPortfolio.Api.Models.DTOs;
+﻿using AutoMapper;
 using FinancialPortfolio.Api.Models;
+using FinancialPortfolio.Api.Models.DTOs.Requests;
+using FinancialPortfolio.Api.Models.DTOs.Responses;
 using FinancialPortfolio.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinancialPortfolio.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/users")]
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -20,7 +22,7 @@ public class UserController : ControllerBase
 
     //GET: api/users
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+    public async Task<ActionResult<IEnumerable<UserResponse>>> GetUsers()
     {
         _logger.LogInformation("Fetching all users");
         var users = await _userService.GetAllUsersAsync();
@@ -30,7 +32,7 @@ public class UserController : ControllerBase
 
     //Get: api/users/2
     [HttpGet("{id}")]
-    public async Task<ActionResult<User>> GetUser(int id)
+    public async Task<ActionResult<UserResponse>> GetUser(int id)
     {
         _logger.LogInformation("Fetching user with ID {UserId}", id);
 
@@ -50,7 +52,7 @@ public class UserController : ControllerBase
     //POST : api/users
 
     [HttpPost]
-    public async Task<ActionResult<User>> CreateUser(CreateUserRequest request)
+    public async Task<ActionResult<UserResponse>> CreateUser(CreateUserRequest request)
     {
         _logger.LogInformation("Creating user with email {Email}", request.Email);
 

@@ -1,21 +1,25 @@
 ﻿namespace FinancialPortfolio.Api.Services;
 
-using Microsoft.EntityFrameworkCore;
 using FinancialPortfolio.Api.Data;
 using FinancialPortfolio.Api.Models;
-using FinancialPortfolio.Api.Models.DTOs;
-using System.Threading.Tasks;
+using FinancialPortfolio.Api.Models.DTOs.Requests;
+using FinancialPortfolio.Api.Models.DTOs.Responses;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using AutoMapper;
 
 public class TransactionService: ITransactionService
 {
     private readonly FinancialPortfolioDbContext _context;
-    public TransactionService(FinancialPortfolioDbContext context)
+    private readonly IMapper _mapper;
+    public TransactionService(FinancialPortfolioDbContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
-    public async Task<Transaction> CreateTransactionAsync(CreateTransactionRequest request)
+    public async Task<TransactionResponse> CreateTransactionAsync(CreateTransactionRequest request)
     {
         // Validate account exists
         var account = await _context.Accounts
@@ -56,7 +60,7 @@ public class TransactionService: ITransactionService
             await UpdateHoldingsAsync(account.PortfolioId, transaction);
         }
 
-        return transaction;
+        return _mapper.Map<TransactionResponse>(transaction);
     }
 
     public async Task<bool> DeleteTransactionAsync(int transactionId)
@@ -86,28 +90,33 @@ public class TransactionService: ITransactionService
         return true;
     }
 
-    public async Task<IEnumerable<Transaction>> GetAccountTransactionsAsync(int accountId)
+    public async Task<IEnumerable<TransactionResponse>> GetAccountTransactionsAsync(int accountId)
     {
-        return await _context.Transactions
+        var response = await _context.Transactions
             .Where(t => t.AccountId == accountId)
             .OrderByDescending(t => t.TransactionDate)
             .ToListAsync();
+        return _mapper.Map<IEnumerable<TransactionResponse>>(response);
     }
 
-    public async Task<IEnumerable<Transaction>> GetPortfolioTransactionsAsync(int portfolioId)
+    public async Task<IEnumerable<TransactionResponse>> GetPortfolioTransactionsAsync(int portfolioId)
     {
-        return await _context.Transactions
+        var response = await _context.Transactions
            .Include(t => t.Account)
            .Where(t => t.Account.PortfolioId == portfolioId)
            .OrderByDescending(t => t.TransactionDate)
            .ToListAsync();
+
+        return _mapper.Map<IEnumerable<TransactionResponse>>(response.ToList());
     }
 
-    public async Task<Transaction?> GetTransactionByIdAsync(int transactionId)
+    public async Task<TransactionResponse?> GetTransactionByIdAsync(int transactionId)
     {
-        return await _context.Transactions
+        var response = await _context.Transactions
            .Include(t => t.Account)
            .FirstOrDefaultAsync(t => t.Id == transactionId);
+
+        return _mapper.Map<TransactionResponse> (response);
     }
 
     // CRITICAL METHOD: This is the heart of the portfolio system!

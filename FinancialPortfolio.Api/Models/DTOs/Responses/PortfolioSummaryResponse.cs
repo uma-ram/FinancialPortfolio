@@ -1,4 +1,4 @@
-﻿namespace FinancialPortfolio.Api.Models.DTOs;
+﻿namespace FinancialPortfolio.Api.Models.DTOs.Responses;
 
 public class PortfolioSummaryResponse
 {

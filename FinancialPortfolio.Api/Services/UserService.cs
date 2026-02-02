@@ -1,34 +1,40 @@
 ﻿namespace FinancialPortfolio.Api.Services;
 
-using Microsoft.EntityFrameworkCore;
+using AutoMapper;
+using Azure;
 using FinancialPortfolio.Api.Data;
 using FinancialPortfolio.Api.Models;
-using FinancialPortfolio.Api.Models.DTOs;
-
+using FinancialPortfolio.Api.Models.DTOs.Requests;
+using FinancialPortfolio.Api.Models.DTOs.Responses;
+using Microsoft.EntityFrameworkCore;
 
 public class UserService : IUserService
 {
     private readonly FinancialPortfolioDbContext _context;
+    private readonly IMapper _mapper;
 
-    public UserService(FinancialPortfolioDbContext context)
+    public UserService(FinancialPortfolioDbContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
-    public async Task<IEnumerable<User>> GetAllUsersAsync()
+    public async Task<IEnumerable<UserResponse>> GetAllUsersAsync()
     {
-        return await _context.Users
+       var response= await _context.Users
             .Include(u => u.Portfolios)
             .ToListAsync();
+      return _mapper.Map<IEnumerable<UserResponse>>(response);
     }
 
-    public async Task<User?> GetUserByIdAsync(int id)
+    public async Task<UserResponse?> GetUserByIdAsync(int id)
     {
-        return await _context.Users
+        var response = await _context.Users
             .Include(u => u.Portfolios)
             .FirstOrDefaultAsync(u => u.Id == id);
+        return _mapper.Map<UserResponse>(response);
     }
 
-    public async Task<User> CreateUserAsync(CreateUserRequest request)
+    public async Task<UserResponse> CreateUserAsync(CreateUserRequest request)
     {
         var existingEmail = await _context.Users
             .AnyAsync(u => u.Email == request.Email);
@@ -46,7 +52,7 @@ public class UserService : IUserService
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        return user;
+        return _mapper.Map<UserResponse>(user);
     }
 
     public async Task<bool> DeleteUserAsync(int id)
