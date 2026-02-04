@@ -26,6 +26,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPriceUpdateService, PriceUpdateService>();
+builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -36,6 +37,15 @@ builder.Services.AddControllers();
 //Automapper
 builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
 
+// Add CORS for frontend (Week 4)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        builder => builder
+            .WithOrigins("http://localhost:3000", "http://localhost:5173") // React dev servers
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
 
 var app = builder.Build();
 
@@ -46,14 +56,22 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    // Add seed endpoint for development
+    app.MapPost("/api/seed", async (FinancialPortfolioDbContext context) =>
+    {
+        await SampleDataSeeder.SeedSampleDataAsync(context);
+        return Results.Ok(new { message = "Sample data seeded successfully" });
+    });
 }
 
-app.UseHttpsRedirection();
 
 ////Basic health check endpoint
 //app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }))
 //.WithName("HealthCheck");
 
+app.UseHttpsRedirection();
+app.UseCors("AllowFrontend");
 app.MapControllers();
 
 app.Run();
