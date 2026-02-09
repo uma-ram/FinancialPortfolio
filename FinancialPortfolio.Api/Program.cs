@@ -61,8 +61,10 @@ if (app.Environment.IsDevelopment())
     app.MapPost("/api/seed", async (FinancialPortfolioDbContext context) =>
     {
         await SampleDataSeeder.SeedSampleDataAsync(context);
-        return Results.Ok(new { message = "Sample data seeded successfully" });
-    });
+        return Results.Ok(new { message = "Sample data seeded successfully", timestamp = DateTime.UtcNow });
+    })
+    .WithName("SeedData")
+    .WithTags("Development");
 }
 
 
