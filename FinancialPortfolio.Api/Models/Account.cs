@@ -16,7 +16,7 @@ public class Account
 
     public int PortfolioId { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     // Navigation properties
     public Portfolio Portfolio { get; set; } = null!;

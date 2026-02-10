@@ -29,14 +29,12 @@ public class FinancialPortfolioDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.Email).IsUnique();
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE()");
         });
 
         // Portfolio configuration
         modelBuilder.Entity<Portfolio>(entity =>
         {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            entity.HasKey(e => e.Id);            
             entity.HasOne(e => e.User)
                 .WithMany(u => u.Portfolios)
                 .HasForeignKey(e => e.UserId)
@@ -48,8 +46,6 @@ public class FinancialPortfolioDbContext : DbContext
         modelBuilder.Entity<Account>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
-
             entity.HasOne(e => e.Portfolio)
                 .WithMany(p => p.Accounts)
                 .HasForeignKey(e => e.PortfolioId)
@@ -60,8 +56,6 @@ public class FinancialPortfolioDbContext : DbContext
         modelBuilder.Entity<Transaction>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.TransactionDate).HasDefaultValueSql("GETUTCDATE()");
-
             entity.HasOne(e => e.Account)
                 .WithMany(a => a.Transactions)
                 .HasForeignKey(e => e.AccountId)
@@ -75,8 +69,6 @@ public class FinancialPortfolioDbContext : DbContext
         modelBuilder.Entity<Holding>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.LastUpdated).HasDefaultValueSql("GETUTCDATE()");
-
             entity.HasOne(e => e.Portfolio)
                 .WithMany(p => p.Holdings)
                 .HasForeignKey(e => e.PortfolioId)

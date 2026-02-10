@@ -1,25 +1,47 @@
+using AutoMapper;
 using FinancialPortfolio.Api.Data;
+using FinancialPortfolio.Api.Mappings;
+using FinancialPortfolio.Api.Repositories;
 using FinancialPortfolio.Api.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.InMemory;
-using AutoMapper;
-using FinancialPortfolio.Api.Mappings;
 using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ========================================
+// Multi-Database Configuration
+// ========================================
+
+var dbProvider = builder.Configuration["DatabaseProvider"] ?? "SqlServer";
+
 //Add dbcontent
 
-if (builder.Environment.IsDevelopment())
-{
+//if (builder.Environment.IsDevelopment())
+//{
+//    // Development: Use In-Memory Database
+//    builder.Services.AddDbContext<FinancialPortfolioDbContext>(options =>
+//        options.UseInMemoryDatabase("FinancialPortfolioDB"));
+//}
+//else
+//{
     builder.Services.AddDbContext<FinancialPortfolioDbContext>(options =>
-        options.UseInMemoryDatabase("FinancialPortfolioDB"));
-}
-else
-{
-    builder.Services.AddDbContext<FinancialPortfolioDbContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-}
+    {
+        switch (dbProvider)
+        {
+            case "PostgreSQL":
+                options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQL"));
+                break;
+            case "SqlServer":
+            default:
+                options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
+                break;
+        }
+    }  );
+//}
+// Register ONE repository that works with BOTH databases!
+builder.Services.AddScoped<IPortfolioRepository, PortfolioRepository>();
+
 // Register Services (Dependency Injection)
 builder.Services.AddScoped<IPortfolioService, PortfolioService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -28,16 +50,15 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPriceUpdateService, PriceUpdateService>();
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
 // Add Controllers
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 //Automapper
 builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
 
-// Add CORS for frontend (Week 4)
+// Add CORS for frontend 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
@@ -50,8 +71,6 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

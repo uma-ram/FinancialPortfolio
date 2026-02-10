@@ -14,7 +14,7 @@ public class Portfolio
 
     public int UserId { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     //Navigation Property
     public User User { get; set; } = null!;

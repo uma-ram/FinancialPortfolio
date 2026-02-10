@@ -25,7 +25,7 @@ public class Transaction
     [Column(TypeName = "decimal(18,2)")]
     public decimal TotalAmount { get; set; } // Quantity * Price
 
-    public DateTime TransactionDate { get; set; }
+    public DateTime TransactionDate { get; set; } = DateTime.UtcNow;
 
     public string? Notes { get; set; }
 

@@ -22,7 +22,7 @@ namespace FinancialPortfolio.Api.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal CurrentPrice { get; set; } // Current market price (updated periodically)
 
-        public DateTime LastUpdated { get; set; }
+        public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
 
         // Calculated properties
         [NotMapped]

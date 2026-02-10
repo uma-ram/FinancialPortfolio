@@ -14,7 +14,7 @@ public class User
     [EmailAddress]
     public string Email { get; set; } = string.Empty;
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     //Navigation Property
     public List<Portfolio> Portfolios { get; set; } = new();
