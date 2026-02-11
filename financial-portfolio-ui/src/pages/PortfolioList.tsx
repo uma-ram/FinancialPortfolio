@@ -21,7 +21,7 @@ export const PortfolioList = () =>{
             setError(null);
 
             // For now, hardcode userId = 1 (we'll make this dynamic later)
-            const data = await portfolioApi.getUSerPortfolios(1);
+            const data = await portfolioApi.getUserPortfolios(1);
             setPortfolios(data);
 
         } catch(err: any){

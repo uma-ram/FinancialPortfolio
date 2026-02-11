@@ -29,7 +29,7 @@ export const  portfolioApi ={
     },
 
     //Portfolios
-    getUSerPortfolios: async(userId: number): Promise<Portfolio[]> =>{
+    getUserPortfolios: async(userId: number): Promise<Portfolio[]> =>{
         const response = await api.get<Portfolio[]>(`/portfolios/user/${userId}`);
         return response.data;
     },

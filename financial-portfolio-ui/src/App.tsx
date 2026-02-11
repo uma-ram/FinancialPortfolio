@@ -1,11 +1,7 @@
-import { PortfolioList } from './pages/PortfolioList';
+import { Dashboard } from './pages/Dashboard';
 
 function App() {
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <PortfolioList />
-    </div>
-  );
+  return <Dashboard />
 }
 
 export default App;
