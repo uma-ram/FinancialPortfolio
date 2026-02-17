@@ -4,6 +4,7 @@ import { portfolioApi } from '../services/api';
 import { Navbar } from '../components/Navbar';
 import { StatCard } from '../components/StatCard';
 import { PortfolioCard } from '../components/PortfolioCard';
+import { usePolling } from '../hooks/usePolling';
 import { 
   Loader2, 
   AlertCircle, 
@@ -16,11 +17,18 @@ import {
   TrendingDown
 } from 'lucide-react';
 
+// Add this prop to Dashboard
+// interface DashboardProps {
+//   onSelectPortfolio?: (portfolioId: number) => void;
+// }
+// { onSelectPortfolio }: DashboardProps
 export const Dashboard = () => {
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [summaries, setSummaries] = useState<Map<number, PortfolioSummary>>(new Map());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+
 
   useEffect(() => {
     fetchDashboardData();
@@ -41,6 +49,20 @@ export const Dashboard = () => {
         try {
           const summary = await portfolioApi.getPortfolioSummary(portfolio.id);
           summaryMap.set(portfolio.id, summary);
+          // console.log("inside");
+          // // Update PortfolioCard onClick
+          // <PortfolioCard
+          //   key={portfolio.id}
+          //   portfolio={portfolio}
+          //   summary={summaries.get(portfolio.id)}
+          //   onClick={() => {
+          //     if (onSelectPortfolio) {
+          //       onSelectPortfolio(portfolio.id);
+          //     } else {
+          //       console.log('Navigate to portfolio', portfolio.id);
+          //     }
+          //   }}
+          // />
         } catch (err) {
           console.error(`Failed to fetch summary for portfolio ${portfolio.id}`, err);
         }
@@ -52,7 +74,15 @@ export const Dashboard = () => {
     } finally {
       setLoading(false);
     }
+    
   };
+
+  // Auto-refresh every 30 seconds
+  usePolling({
+    callback: fetchDashboardData,
+    interval: 30000, // 30 seconds
+    enabled: true, // Set to false to disable
+  });
 
   // Calculate overall stats
   const calculateOverallStats = () => {

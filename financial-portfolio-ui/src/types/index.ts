@@ -72,3 +72,4 @@ export interface HoldingSummary {
   gainLoss: number;
   gainLossPercentage: number;
 }
+
