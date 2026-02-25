@@ -1,19 +1,54 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
 using FinancialPortfolio.Api.Data;
 using FinancialPortfolio.Api.Models.DTOs.Requests;
 using FinancialPortfolio.Api.Models.DTOs.Responses;
+using FinancialPortfolio.Api.Models.Mongo;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinancialPortfolio.Api.Services;
 
 public class AnalyticsService : IAnalyticsService
 {
     private readonly FinancialPortfolioDbContext _context;
+    private readonly IMongoAnalyticsService _mongoService;
+    private readonly ILogger<AnalyticsService> _logger;
+    private readonly IMapper _mapper;
 
-    public AnalyticsService(FinancialPortfolioDbContext context)
+    public AnalyticsService(FinancialPortfolioDbContext context,
+        IMongoAnalyticsService mongoService,
+        ILogger<AnalyticsService> logger,
+        IMapper mapper)
     {
         _context = context;
+        _mongoService = mongoService;
+        _logger = logger;
+        _mapper = mapper;
     }
+
     public async Task<PortfolioAnalyticsResponse?> GetPortfolioAnalyticsAsync(int portfolioId)
+    {
+        // Try to get from cache first
+        var cached = await _mongoService.GetCachedAnalyticsAsync(portfolioId);
+        if (cached != null)
+        {
+            _logger.LogInformation("Returning cached analytics for portfolio {PortfolioId}", portfolioId);
+            return MapCacheToResponse(cached);
+        }
+
+        // Cache miss - calculate from database
+        _logger.LogInformation("Calculating fresh analytics for portfolio {PortfolioId}", portfolioId);
+        var analytics = await CalculateAnalyticsFromDatabase(portfolioId);
+
+        if (analytics != null)
+        {
+            // Cache the result
+            await _mongoService.CacheAnalyticsAsync(MapResponseToCache(analytics));
+        }
+
+        return analytics;
+    }
+
+    private async Task<PortfolioAnalyticsResponse?> CalculateAnalyticsFromDatabase(int portfolioId)
     {
         var portfolio = await _context.Portfolios
            .Include(p => p.Holdings)
@@ -149,6 +184,47 @@ public class AnalyticsService : IAnalyticsService
             TopGainers = topGainers,
             TopLosers = topLosers
         };
+    }
+
+    private PortfolioAnalyticsResponse MapCacheToResponse(PortfolioAnalyticsCache cached)        
+    {
+        return _mapper.Map<PortfolioAnalyticsResponse>(cached);
+        //return new PortfolioAnalyticsResponse
+        //{
+        //    PortfolioId = cached.PortfolioId,
+        //    PortfolioName = cached.PortfolioName,
+        //    TotalValue = cached.TotalValue,
+        //    TotalCost = cached.TotalCost,
+        //    TotalGainLoss = cached.TotalGainLoss,
+        //    TotalReturnOnInvestment = cached.TotalGainLossPercentage,
+        //    Performance = cached.Performance,
+        //    Holdings = cached.Holdings,
+        //    AssetAllocations = cached.AssetAllocations,
+        //    TopGainers = cached.TopGainers,
+        //    TopLosers = cached.TopLosers            
+        //};
+    }
+
+    private PortfolioAnalyticsCache MapResponseToCache(PortfolioAnalyticsResponse response)
+    {
+        return _mapper.Map<PortfolioAnalyticsCache>(response);
+
+        //return new PortfolioAnalyticsCache
+        //{
+        //    PortfolioId = response.PortfolioId,
+        //    PortfolioName = response.PortfolioName,
+        //    TotalValue = response.TotalValue,
+        //    TotalCost = response.TotalCost,
+        //    TotalGainLoss = response.TotalGainLoss,
+        //    TotalGainLossPercentage = response.TotalGainLossPercentage,
+        //    TotalReturnOnInvestment = response.TotalReturnOnInvestment,
+        //    Performance = response.Performance,
+        //    Holdings = response.Holdings,
+        //    AssetAllocations = response.AssetAllocations,
+        //    TopGainers = response.TopGainers,
+        //    TopLosers = response.TopLosers,
+        //    LastUpdated = DateTime.UtcNow
+        //};
     }
 
     public async Task<TransactionHistoryResponse> GetTransactionHistoryAsync(int portfolioId, DateTime? startDate = null, DateTime? endDate = null, string? transactionType = null)

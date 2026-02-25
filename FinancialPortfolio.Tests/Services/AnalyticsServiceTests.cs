@@ -1,18 +1,50 @@
-﻿using Xunit;
-using FinancialPortfolio.Api.Services;
+﻿using AutoMapper;
+using FinancialPortfolio.Api.Data;
 using FinancialPortfolio.Api.Models;
+using FinancialPortfolio.Api.Models.Mongo;
+using FinancialPortfolio.Api.Services;
 using FinancialPortfolio.Tests.TestHelpers;
+using Microsoft.Extensions.Logging;
+using Moq;
+using Xunit;
 
 namespace FinancialPortfolio.Tests.Services;
 
 public class AnalyticsServiceTests
 {
+    // Shared mocks - create once, reuse in both tests
+    private readonly Mock<IMongoAnalyticsService> _mockMongoService;
+    private readonly Mock<ILogger<AnalyticsService>> _mockLogger;
+    private readonly Mock<IMapper> _mockMapper;
+
+    public AnalyticsServiceTests()
+    {
+        _mockMongoService = new Mock<IMongoAnalyticsService>();
+        _mockLogger = new Mock<ILogger<AnalyticsService>>();
+        _mockMapper = new Mock<IMapper>();
+
+        //  Tell mongo service to return null (cache miss) so it falls through to DB calculation
+        _mockMongoService
+            .Setup(m => m.GetCachedAnalyticsAsync(It.IsAny<int>()))
+            .ReturnsAsync((PortfolioAnalyticsCache?)null);
+
+        _mockMongoService
+            .Setup(m => m.CacheAnalyticsAsync(It.IsAny<PortfolioAnalyticsCache>()))
+            .Returns(Task.CompletedTask);
+    }
+
+    private AnalyticsService CreateService(FinancialPortfolioDbContext context)
+    {
+        // Helper method so both tests create the service the same way
+        return new AnalyticsService(context, _mockMongoService.Object, _mockLogger.Object, _mockMapper.Object);
+    }
+
     [Fact]
     public async Task GetPortfolioAnalytics_ShouldCalculateMetricsCorrectly()
     {
         // Arrange
         var context = DbContextHelper.CreateInMemoryContext();
-        var service = new AnalyticsService(context);
+        var service = CreateService(context);
 
         var user = new User { Username = "Test", Email = "test@test.com", CreatedAt = DateTime.UtcNow };
         var portfolio = new Portfolio { Name = "Test", UserId = 1, CreatedAt = DateTime.UtcNow };
@@ -67,7 +99,7 @@ public class AnalyticsServiceTests
     {
         // Arrange
         var context = DbContextHelper.CreateInMemoryContext();
-        var service = new AnalyticsService(context);
+        var service = CreateService(context);
 
         var user = new User { Username = "Test", Email = "test@test.com", CreatedAt = DateTime.UtcNow };
         var portfolio = new Portfolio { Name = "Test", UserId = 1, CreatedAt = DateTime.UtcNow };

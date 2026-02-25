@@ -6,6 +6,7 @@ using FinancialPortfolio.Api.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.InMemory;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +40,11 @@ var dbProvider = builder.Configuration["DatabaseProvider"] ?? "SqlServer";
         }
     }  );
 //}
+
+// Add MongoDB
+var mongoConnectionString = builder.Configuration.GetConnectionString("MongoDB")?? "mongodb://localhost:27017";
+builder.Services.AddSingleton<IMongoClient>(new MongoClient(mongoConnectionString));
+
 // Register ONE repository that works with BOTH databases!
 builder.Services.AddScoped<IPortfolioRepository, PortfolioRepository>();
 
@@ -49,6 +55,7 @@ builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPriceUpdateService, PriceUpdateService>();
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
+builder.Services.AddScoped<IMongoAnalyticsService, MongoAnalyticsService>();
 
 // Add Controllers
 builder.Services.AddControllers();
