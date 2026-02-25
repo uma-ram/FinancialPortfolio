@@ -25,7 +25,7 @@ public class PortfolioIntegrationTests:IClassFixture<WebApplicationFactory<Progr
         var createUserRequest = new CreateUserRequest
         {
             Name = "Test User",
-            Email = "test@integration.com"
+            Email = "test25@integration.com"
         };
 
         var userResponse = await _client.PostAsJsonAsync("/api/users", createUserRequest);
