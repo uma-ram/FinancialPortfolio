@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FinancialPortfolio.Api.Models.DTOs.Requests;
+using FinancialPortfolio.Api.Models.DTOs.Responses;
 using FinancialPortfolio.Api.Services;
-using FinancialPortfolio.Api.Models.DTOs.Requests;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FinancialPortfolio.Api.Controllers;
 
@@ -21,7 +22,7 @@ public class AccountController : ControllerBase
 
     // GET: api/accounts/portfolio/5
     [HttpGet("portfolio/{portfolioId}")]
-    public async Task<IActionResult> GetPortfolioAccounts(int portfolioId)
+    public async Task<ActionResult<AccountResponse>> GetPortfolioAccounts(int portfolioId)
     {
         try
         {
@@ -37,7 +38,7 @@ public class AccountController : ControllerBase
 
     // GET: api/accounts/5
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetAccount(int id)
+    public async Task<ActionResult<AccountResponse>> GetAccount(int id)
     {
         try
         {
@@ -59,7 +60,7 @@ public class AccountController : ControllerBase
 
     // POST: api/accounts
     [HttpPost]
-    public async Task<IActionResult> CreateAccount([FromBody] CreateAccountRequest request)
+    public async Task<ActionResult<AccountResponse>> CreateAccount([FromBody] CreateAccountRequest request)
     {
         try
         {
