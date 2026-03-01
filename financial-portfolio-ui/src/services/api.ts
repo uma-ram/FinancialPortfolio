@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Portfolio, PortfolioSummary, User } from "../types";
+import type { Portfolio,  PortfolioSummary,  User,  Transaction, Account } from "../types";
 
 //Create axios instance with base URL
 const api = axios.create({
@@ -23,7 +23,7 @@ export const  portfolioApi ={
         return response.data;
     },
 
-    createUSer: async(data:{name:string, email:string}):Promise<User>=>{
+    createUser: async(data:{name:string, email:string}):Promise<User>=>{
         const response = await api.post<User>(`/users`,data);
         return response.data;
     },
@@ -49,9 +49,35 @@ export const  portfolioApi ={
         description?: string;
         userId: number;
     }): Promise<Portfolio> => {
-        const response = await api.post<Portfolio>('/portfolios', data);
+        const response = await api.post<Portfolio>(`/portfolios`, data);
         return response.data;
     },
+
+    //Transaction
+    createTransaction: async (data:{
+        accountId: number;
+        transactionType: string;
+        symbol?: string;
+        quantity: number;
+        price: number;
+        notes?: string;
+    }): Promise<Transaction> =>{
+        const resposne = await api.post<Transaction>(`/transactions`, data);
+        return resposne.data;
+    },
+
+    getPortfolioAccounts: async (id:number): Promise<Account[]> =>{    
+        const response = await api.get<Account[]>(`/accounts/portfolio/${id}`);
+        return response.data;
+    },
+
+    getAccountTransactions: async (accountId : number): Promise<Transaction[]> =>{
+        const response = await api.get<Transaction[]>(`/transactions/account/${accountId}`);
+        //console.log(response.data.transactions);
+        return response.data; //.transactions;
+    },
+
+
 };
 
 export default api;

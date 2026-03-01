@@ -1,11 +1,17 @@
 // import { useState } from 'react';
-import { Dashboard } from './pages/Dashboard';
+// import { Dashboard } from './pages/Dashboard';
 // import { PortfolioDetails } from './pages/PortfolioDetails';
 //import { HooksDemo } from './pages/HooksDemo';
+//  import { Transactions } from './pages/Transactions';
+import { Analytics } from './pages/Analytics';
 
 function App() {
- // return <HooksDemo />
- return <Dashboard />
+
+  return <Analytics />;
+  //return <HooksDemo />
+    // return <Dashboard />
+  //  return <Transactions />
+
 //  const [selectedPortfolioId, setSelectedPortfolioId] = useState<number | null>(null);
 
 //   // If portfolio selected, show details

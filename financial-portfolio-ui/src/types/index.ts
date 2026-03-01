@@ -15,7 +15,7 @@ export interface Portfolio{
   accounts?: Account[];
   holdings?: Holding[];
 }
-export interface Account {
+export interface Account {  
   id: number;
   name: string;
   accountType: string;
@@ -33,6 +33,15 @@ export interface Transaction {
   price: number;
   totalAmount: number;
   transactionDate: string;
+  notes?: string;
+}
+
+export interface CreateTransactionRequest{
+  accountId: number;
+  transactionType: string;
+  symbol?: string;
+  quantity: number;
+  price: number;
   notes?: string;
 }
 
