@@ -42,7 +42,7 @@ export function useDataFetching<T>({
     if (autoFetch) {
       fetchData();
     }
-  }, [...dependencies, fetchData, autoFetch]);
+  }, [...dependencies]); //, fetchData, autoFetch
 
   return { data, loading, error, refetch: fetchData };
 }

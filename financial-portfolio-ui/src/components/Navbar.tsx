@@ -1,11 +1,20 @@
+import { Link, useLocation } from 'react-router-dom';
 import { TrendingUp, Home, Briefcase, ArrowLeftRight, BarChart3, User } from "lucide-react";
 
 export const Navbar = () => {
+    const location = useLocation();
+
+  // Helper to check if link is active
+  const isActive = (path: string) => {
+    return location.pathname === path || location.pathname.startsWith(path);
+  };
+
     return(
         <nav className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
+                    <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity"></Link>
                     <div className="flex items-center space-x-3">
                         <div className="bg-white p-2 rounded-lg">
                             <TrendingUp className="w-6 h-6 text-blue-600" />
@@ -15,10 +24,30 @@ export const Navbar = () => {
 
                     {/* Navigation Links */}
                     <div className="hidden md:flex space-x-6">
-                        <NavLink icon={<Home className="w-5 h-5" />} label="Dashboard" active />
-                        <NavLink icon={<Briefcase className="w-5 h-5" />} label="Portfolios" />
-                        <NavLink icon={<ArrowLeftRight className="w-5 h-5" />} label="Transactions" />
-                        <NavLink icon={<BarChart3 className="w-5 h-5" />} label="Analytics" />
+                        <NavLink 
+                            to="/" 
+                            icon={<Home className="w-5 h-5" />} 
+                            label="Dashboard" 
+                            active={isActive('/')} 
+                            />
+                        <NavLink 
+                            to="/portfolios" 
+                            icon={<Briefcase className="w-5 h-5" />} 
+                            label="Portfolios" 
+                            active={isActive('/portfolios')} 
+                        />
+                        <NavLink 
+                            to="/transactions" 
+                            icon={<ArrowLeftRight className="w-5 h-5" />} 
+                            label="Transactions" 
+                            active={isActive('/transactions')} 
+                        />
+                        <NavLink 
+                            to="/analytics" 
+                            icon={<BarChart3 className="w-5 h-5" />} 
+                            label="Analytics" 
+                            active={isActive('/analytics')} 
+                        />
                     </div>
 
                      {/* User Menu */}
@@ -40,14 +69,16 @@ export const Navbar = () => {
 
 // NavLink Component
 interface NavLinkProps {
+  to:string
   icon: React.ReactNode;
   label: string;
   active?: boolean;
 }
 
-const NavLink = ({ icon, label, active }: NavLinkProps) => {
+const NavLink = ({ to, icon, label, active }: NavLinkProps) => {
   return (
-    <button
+    <Link
+      to={to}
       className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
         active
           ? 'bg-blue-700 text-white'
@@ -56,6 +87,6 @@ const NavLink = ({ icon, label, active }: NavLinkProps) => {
     >
       {icon}
       <span className="font-medium">{label}</span>
-    </button>
+    </Link>
   );
 };

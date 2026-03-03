@@ -1,36 +1,31 @@
-// import { useState } from 'react';
-// import { Dashboard } from './pages/Dashboard';
-// import { PortfolioDetails } from './pages/PortfolioDetails';
-//import { HooksDemo } from './pages/HooksDemo';
-//  import { Transactions } from './pages/Transactions';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Layout } from './components/Layout';
+import { Dashboard } from './pages/Dashboard';
+import { Portfolios } from './pages/Portfolios';
+import { PortfolioDetailsPage } from './pages/PortfolioDetailsPage';
+import { Transactions } from './pages/Transactions';
 import { Analytics } from './pages/Analytics';
+import { NotFound } from './pages/NotFound';
 
 function App() {
 
-  return <Analytics />;
-  //return <HooksDemo />
-    // return <Dashboard />
-  //  return <Transactions />
-
-//  const [selectedPortfolioId, setSelectedPortfolioId] = useState<number | null>(null);
-
-//   // If portfolio selected, show details
-//   if (selectedPortfolioId) {
-//     return (
-//       <div>
-//         <button 
-//           onClick={() => setSelectedPortfolioId(null)}
-//           className="fixed top-4 left-4 px-4 py-2 bg-blue-600 text-white rounded-lg z-50"
-//         >
-//           ← Back to Dashboard
-//         </button>
-//         <PortfolioDetails portfolioId={selectedPortfolioId} />
-//       </div>
-//     );
-//   }
-
-//   // Otherwise show dashboard
-//   return <Dashboard onSelectPortfolio={setSelectedPortfolioId} />;
+  return(
+     <BrowserRouter>
+      <Routes>
+        {/* Routes with Layout (includes Navbar) */}
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="portfolios" element={<Portfolios />} />
+          <Route path="portfolio/:id" element={<PortfolioDetailsPage />} />
+          <Route path="transactions" element={<Transactions />} />
+          <Route path="analytics" element={<Analytics />} />
+          
+          {/* 404 Not Found */}
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  )
 }
 
 export default App;

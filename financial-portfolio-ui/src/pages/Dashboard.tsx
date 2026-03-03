@@ -1,3 +1,4 @@
+import {useNavigate} from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import type { Portfolio, PortfolioSummary } from '../types';
 import { portfolioApi } from '../services/api';
@@ -23,6 +24,7 @@ import {
 // }
 // { onSelectPortfolio }: DashboardProps
 export const Dashboard = () => {
+  const navigate = useNavigate();
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [summaries, setSummaries] = useState<Map<number, PortfolioSummary>>(new Map());
   const [loading, setLoading] = useState(true);
@@ -183,8 +185,7 @@ export const Dashboard = () => {
 
   // Main dashboard
   return (
-    <>
-      <Navbar />
+    
       <div className="min-h-screen bg-gray-50">
         <div className="container mx-auto px-4 py-8">
           {/* Header */}
@@ -263,7 +264,7 @@ export const Dashboard = () => {
                   key={portfolio.id}
                   portfolio={portfolio}
                   summary={summaries.get(portfolio.id)}
-                  onClick={() => console.log('Navigate to portfolio', portfolio.id)}
+                  onClick={() => navigate(`/portfolio/${portfolio.id}`)} //console.log('Navigate to portfolio', portfolio.id)}
                 />
               ))}
             </div>
@@ -304,6 +305,6 @@ export const Dashboard = () => {
           </div>
         </div>
       </div>
-    </>
+    
   );
 };

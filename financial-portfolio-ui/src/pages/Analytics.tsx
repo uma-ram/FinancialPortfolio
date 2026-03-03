@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { portfolioApi } from '../services/api';
 import type { PortfolioSummary } from '../types';
-import { Navbar } from '../components/Navbar';
 import { PortfolioPerformanceChart } from '../components/charts/PortfolioPerformanceChart';
 import { AssetAllocationChart } from '../components/charts/AssetAllocationChart';
 import { HoldingsPerformanceChart } from '../components/charts/HoldingsPerformanceChart';
@@ -94,30 +93,27 @@ export const Analytics = () => {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-GB', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'GBP',
     }).format(amount);
   };
 
   if (loading) {
     return (
-      <>
-        <Navbar />
         <div className="flex items-center justify-center min-h-screen bg-gray-50">
           <div className="text-center">
             <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
             <p className="text-gray-600">Loading analytics...</p>
           </div>
         </div>
-      </>
+     
     );
   }
 
   if (error || !summary) {
     return (
-      <>
-        <Navbar />
+      
         <div className="flex items-center justify-center min-h-screen bg-gray-50">
           <div className="text-center max-w-md">
             <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-4" />
@@ -132,15 +128,14 @@ export const Analytics = () => {
             </button>
           </div>
         </div>
-      </>
+      
     );
   }
 
   const isPositive = summary.totalGainLoss >= 0;
 
   return (
-    <>
-      <Navbar />
+    
       <div className="min-h-screen bg-gray-50">
         <div className="container mx-auto px-4 py-8">
           {/* Header */}
@@ -264,6 +259,6 @@ export const Analytics = () => {
           </div>
         </div>
       </div>
-    </>
+    
   );
 };

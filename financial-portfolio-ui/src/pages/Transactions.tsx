@@ -3,7 +3,7 @@ import type{ Transaction, Account } from '../types';
 import { portfolioApi } from '../services/api';
 import { TransactionForm } from '../components/TransactionForm';
 import { Toast } from '../components/Toast';
-import { Navbar } from '../components/Navbar';
+
 import { 
   Loader2, 
   AlertCircle, 
@@ -116,32 +116,26 @@ export const Transactions = () => {
 
   if (loading) {
     return (
-      <>
-        <Navbar />
         <div className="flex items-center justify-center min-h-screen bg-gray-50">
           <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
         </div>
-      </>
+      
     );
   }
 
   if (error) {
     return (
-      <>
-        <Navbar />
         <div className="flex items-center justify-center min-h-screen bg-gray-50">
           <div className="text-center">
             <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-4" />
             <p className="text-red-600">{error}</p>
           </div>
         </div>
-      </>
+      
     );
   }
 
   return (
-    <>
-      <Navbar />
       <div className="min-h-screen bg-gray-50">
         <div className="container mx-auto px-4 py-8">
           {/* Header */}
@@ -257,16 +251,18 @@ export const Transactions = () => {
             )}
           </div>
         </div>
+        {/* Toast Notification */}
+              {toast && (
+                <Toast
+                  message={toast.message}
+                  type={toast.type}
+                  onClose={() => setToast(null)}
+                />
+              )}
+
       </div>
 
-      {/* Toast Notification */}
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
-    </>
+      
+    
   );
 };
